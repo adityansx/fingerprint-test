@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const requestIp = require('request-ip');
 const PORT = 3000;
 const path = require('path');
 
@@ -62,7 +63,7 @@ app.post('/deviceId', async (req, res) => {
     const newFp = await prisma.userFingerprint.create({
         data: {
             deviceFp: req.body.fp,
-            deviceIP: req.ip
+            deviceIP: requestIp.getClientIp(req)
         }
     })
     console.log(newFp);
