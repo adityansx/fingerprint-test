@@ -18,11 +18,20 @@ app.get('/', (req, res) => {
 })
 
 app.get('/mod', async (req, res) => {
-    // res.render('mod', { devId: deviceIds }, function(err, html) {
-    //     res.send(html);
-    // });
-    const devFps = await prisma.userFingerprint.findMany();
+    const devFps = await prisma.userFingerprint.findMany({
+        include: {
+            UserIPAddresses: true
+        }
+    });
+    console.log(devFps.UserIPAddresses);
+    console.log('\n--------------------\n');
 
+    const devIPs = await prisma.userIPAddresses.findMany({
+        where: {
+            deviceFp: "eb3e4714d4151ada7316c9a15c592bff"
+        }
+    })
+    console.log(devIPs);
     res.render('mod', { devId: devFps }, function(err, html) {
         res.send(html);
     });
@@ -32,38 +41,15 @@ app.get('/deviceId', (req, res) => {
     res.send(deviceIds);
 })
 
-app.get('/bill', (req, res) => {
-    res.render('bill')
-})
-
-// app.post('/deviceId', (req, res) => {
-//     const newId = {
-//         ip: req.ip,
-//         id: req.body.fp
-//     }
-//     deviceIds.push(newId);
-//     console.log(newId);
-// })
-
 app.post('/deviceId', async (req, res) => {
-    // const fingerprintExists = await prisma.$exists.userFingerprint({
-    //     deviceFp: req.body.fp
-    // })
-
-    // if(fingerprintExists) {
-    //     const newIP = await prisma.userIP.create({
-    //         data: {
-    //             deviceIP: req.ip
-    //         }
-    //     })
-    //     console.log(newIP);
-    // } else {
-        
-    // }
     const newFp = await prisma.userFingerprint.create({
         data: {
-            deviceFp: req.body.fp,
-            deviceIP: requestIp.getClientIp(req)
+            userFp: req.body.fp,
+            UserIPAddresses: {
+                create: {
+                    userIP: requestIp.getClientIp(req)
+                }
+            }
         }
     })
     console.log(newFp);

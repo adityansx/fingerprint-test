@@ -11,7 +11,14 @@ datasource db {
 }
 
 model UserFingerprint {
-    id       String @id @default(uuid())
-    deviceFp String
-    deviceIP String
+    id              String            @id @default(uuid())
+    userFp          String            @unique
+    UserIPAddresses UserIPAddresses[]
+}
+
+model UserIPAddresses {
+    id              String          @id @default(uuid())
+    userIP          String
+    userFingerprint UserFingerprint @relation(fields: [deviceFp], references: [userFp])
+    deviceFp        String
 }
