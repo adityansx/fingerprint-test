@@ -18,21 +18,23 @@ app.get('/', (req, res) => {
 })
 
 app.get('/mod', async (req, res) => {
-    const devFps = await prisma.userFingerprint.findMany({
-        include: {
-            UserIPAddresses: true
-        }
-    });
-    console.log(devFps.UserIPAddresses);
-    console.log('\n--------------------\n');
-
-    const devIPs = await prisma.userIPAddresses.findMany({
+    const devFps = await prisma.userFingerprint.findMany();
+    const userIP = await prisma.userIPAddresses.findMany({
         where: {
-            deviceFp: "eb3e4714d4151ada7316c9a15c592bff"
+            deviceFp: devFps[0].userFp
         }
     })
-    console.log(devIPs);
-    res.render('mod', { devId: devFps }, function(err, html) {
+    console.log(devFps);
+    console.log(userIP);
+    // console.log('\n--------------------\n');
+
+    // const devIPs = await prisma.userIPAddresses.findMany({
+    //     where: {
+    //         deviceFp: "eb3e4714d4151ada7316c9a15c592bff"
+    //     }
+    // })
+    // console.log(devIPs);
+    res.render('mod', { devId: devFps }, function (err, html) {
         res.send(html);
     });
 })
